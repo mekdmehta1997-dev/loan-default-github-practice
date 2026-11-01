@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: loan-default-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: loan-default-api
+  template:
+    metadata:
+      labels:
+        app: loan-default-api
+    spec:
+      containers:
+        - name: api
+          image: loan-default-api:local
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 10

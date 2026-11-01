@@ -1,0 +1,10 @@
+# Deployment is intentionally manual until a container registry,
+# credentials and Kubernetes access strategy are configured.
+name: CD placeholder
+on:
+  workflow_dispatch:
+jobs:
+  explain:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Configure GHCR and a secure Kubernetes runner before deployment."
