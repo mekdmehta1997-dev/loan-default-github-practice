@@ -64,7 +64,7 @@ def train(
     y_train = df["default"]
 
     # Train the model
-    clf = LogisticRegression(max_iter=1000)
+    clf = LogisticRegression(max_iter=1500)
     clf.fit(X_train, y_train)
 
     # Save trained model as a Kubeflow artifact
