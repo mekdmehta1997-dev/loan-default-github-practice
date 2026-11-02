@@ -1,0 +1,40 @@
+
+name: Kubeflow Pipeline CI
+
+on:
+  push:
+    paths:
+      - "kubeflow/**"
+      - ".github/workflows/kubeflow-ci.yml"
+  pull_request:
+    paths:
+      - "kubeflow/**"
+      - ".github/workflows/kubeflow-ci.yml"
+
+jobs:
+  validate-kubeflow:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Kubeflow SDK
+        run: pip install "kfp>=2,<3"
+
+      - name: Compile Kubeflow pipeline
+        run: python kubeflow/pipeline.py
+
+      - name: Verify generated YAML
+        run: test -s kubeflow/loan_pipeline.yaml
+
+      - name: Upload compiled pipeline artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: loan-default-kubeflow-pipeline
+          path: kubeflow/loan_pipeline.yaml
