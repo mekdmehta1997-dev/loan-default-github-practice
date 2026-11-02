@@ -27,6 +27,13 @@ jobs:
       - name: Install Kubeflow SDK
         run: pip install "kfp>=2,<3"
 
+
+      - name: Install testing dependencies
+        run: pip install pytest
+
+      - name: Run tests
+        run: python -m pytest tests/
+
       - name: Compile Kubeflow pipeline
         run: python kubeflow/pipeline.py
 
