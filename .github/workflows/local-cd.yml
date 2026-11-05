@@ -1,0 +1,47 @@
+
+name: Local Kubernetes CD
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: [self-hosted, Windows, X64]
+
+    defaults:
+      run:
+        shell: pwsh
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check Kubernetes context
+        run: |
+          $context = kubectl config current-context
+          if ($context -ne "kind-loan-deafualt-github-practice") {
+            throw "Wrong Kubernetes context: $context"
+          }
+
+      - name: Build Docker image
+        run: |
+          docker build -t loan-default-github-practice-api:local .
+          if ($LASTEXITCODE -ne 0) { throw "Docker build failed" }
+
+      - name: Load image into KIND
+        run: |
+          kind load docker-image loan-default-github-practice-api:local --name loan-deafualt-github-practice
+          if ($LASTEXITCODE -ne 0) { throw "KIND image load failed" }
+
+      - name: Restart Kubernetes Deployment
+        run: |
+          kubectl rollout restart deployment/loan-default-api -n default
+          if ($LASTEXITCODE -ne 0) { throw "Deployment restart failed" }
+
+      - name: Verify rollout
+        run: |
+          kubectl rollout status deployment/loan-default-api -n default --timeout=180s
+          if ($LASTEXITCODE -ne 0) { throw "Deployment rollout failed" }
